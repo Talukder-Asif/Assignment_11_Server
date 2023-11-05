@@ -35,6 +35,12 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
+    // Get food data from the database
+    app.get('/availablefoods', async(req, res)=>{
+        const cursor = dataCollection.find().sort({ quantity: -1 }).limit(8);
+        const result = await cursor.toArray();
+        res.send(result);
+    })
 
 
 
