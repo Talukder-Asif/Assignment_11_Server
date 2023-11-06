@@ -44,9 +44,15 @@ async function run() {
 
     // Get  food data from the database
     app.get('/foods', async(req, res)=>{
-        const cursor = dataCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+
+
+        const result = await dataCollection.find()
+      .skip(page * size)
+      .limit(size)
+      .toArray();
+      res.send(result);
     })
 
     // Get the search food from the database
@@ -60,6 +66,12 @@ async function run() {
         res.status(500).json({ error: 'An error occurred while searching for items.' });
       }
     });
+
+    // get the total number of items
+    app.get('/totalItems', async(req, res)=>{
+      const count = await dataCollection.estimatedDocumentCount();
+      res.send({count});
+    })
     
 
 
