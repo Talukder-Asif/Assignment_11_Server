@@ -29,18 +29,38 @@ async function run() {
     const database = client.db("TestHalal");
     const dataCollection = database.collection("ProductData");
 
-    // Get food data from the database
+    // Get top sell food data from the database
     app.get('/top6foods', async(req, res)=>{
         const cursor = dataCollection.find().sort({ orderNumber: -1 }).limit(6);
         const result = await cursor.toArray();
         res.send(result);
     })
-    // Get food data from the database
+    // Get available food data from the database
     app.get('/availablefoods', async(req, res)=>{
         const cursor = dataCollection.find().sort({ quantity: -1 }).limit(8);
         const result = await cursor.toArray();
         res.send(result);
     })
+
+    // Get  food data from the database
+    app.get('/foods', async(req, res)=>{
+        const cursor = dataCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+
+    // Get the search food from the database
+    app.get('/foods/search', async (req, res) => {
+      const searchName = req.query.query;
+      try {
+        const results = await dataCollection.find({ name: { $regex: searchName, $options: 'i' } }).toArray();
+        res.json(results);
+      } catch (error) {
+        console.error('Error searching for items:', error);
+        res.status(500).json({ error: 'An error occurred while searching for items.' });
+      }
+    });
+    
 
 
 
