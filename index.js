@@ -10,7 +10,7 @@ app.use(express.json());
 
 // Mongodb server code 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.eykzqz7.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -46,8 +46,6 @@ async function run() {
     app.get('/foods', async(req, res)=>{
       const page = parseInt(req.query.page);
       const size = parseInt(req.query.size);
-
-
         const result = await dataCollection.find()
       .skip(page * size)
       .limit(size)
@@ -72,6 +70,15 @@ async function run() {
       const count = await dataCollection.estimatedDocumentCount();
       res.send({count});
     })
+
+
+    // get single food by id
+    app.get("/foods/:id", async (req, res) => {
+      const id = req.params.id;
+      const quary = { _id: new ObjectId(id) };
+      const result = await dataCollection.findOne(quary);
+      res.send(result);
+    });
     
 
 
