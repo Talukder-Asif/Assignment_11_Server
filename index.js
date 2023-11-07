@@ -28,8 +28,8 @@ async function run() {
     // await client.connect();
     const database = client.db("TestHalal");
     const dataCollection = database.collection("ProductData");
-
     const userCollection = database.collection("UserData");
+    const orderCollection = database.collection("OrderData");
 
     // Get top sell food data from the database
     app.get('/top6foods', async(req, res)=>{
@@ -100,6 +100,39 @@ async function run() {
       const result = await userCollection.updateOne(filter, updatedDoc, options);
       res.send(result);
     })
+
+
+    // Update Food information to database
+    app.put('/foods/:id', async(req, res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const data = req.body;
+      const updatedDoc = {
+        $set: {
+          quantity : data.quantity,
+          orderNumber : data.orderNumber, 
+          name : data.name,
+          image : data.image,
+          category: data.category,
+          price : data.price,
+          origine: data.origine,
+          shortDescription: data.shortDescription,
+          details: data.details,
+        },
+      };
+      const options = {upsert: true};
+      const result = await dataCollection.updateOne(filter, updatedDoc, options);
+      res.send(result);
+    })
+
+
+    // add a order data to the server
+    app.post('/orders', async(req, res)=>{
+      const data = req.body;
+      const result = await orderCollection?.insertOne(data);
+      res.send(result);
+    })
+
 
 
     // Send a ping to confirm a successful connection
