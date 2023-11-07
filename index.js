@@ -69,13 +69,8 @@ async function run() {
     // Get the search food from the database
     app.get('/foods/search', async (req, res) => {
       const searchName = req.query.query;
-      try {
         const results = await dataCollection.find({ name: { $regex: searchName, $options: 'i' } }).toArray();
-        res.json(results);
-      } catch (error) {
-        console.error('Error searching for items:', error);
-        res.status(500).json({ error: 'An error occurred while searching for items.' });
-      }
+        res.send(results);
     });
 
     // get the total number of items
@@ -161,6 +156,29 @@ app.delete('/food/:id', async(req, res)=>{
   const result = await dataCollection.deleteOne(query);
   res.send(result);
 })
+
+
+
+// get the order info from the database
+app.get('/order/:email', async (req, res) => {
+  const email = req.params.email;
+  const query = { orderdemail: email };
+  const result = await orderCollection.find(query)
+  .sort({ _id: -1 })
+  .toArray()
+res.send(result);
+
+});
+
+// Delete a order history
+app.delete('/order/:id', async(req, res)=>{
+  const id = req.params.id;
+  const query = {_id : new ObjectId(id)};
+  const result = await orderCollection.deleteOne(query);
+  res.send(result);
+})
+
+
 
 
     // Send a ping to confirm a successful connection
