@@ -29,6 +29,8 @@ async function run() {
     const database = client.db("TestHalal");
     const dataCollection = database.collection("ProductData");
 
+    const userCollection = database.collection("UserData");
+
     // Get top sell food data from the database
     app.get('/top6foods', async(req, res)=>{
         const cursor = dataCollection.find().sort({ orderNumber: -1 }).limit(6);
@@ -79,8 +81,25 @@ async function run() {
       const result = await dataCollection.findOne(quary);
       res.send(result);
     });
-    
 
+
+    // Update user information to database
+    app.put('/user/:email', async(req, res)=>{
+      const userEmail = req.params.email;
+      const filter = {email: userEmail};
+      const data = req.body;
+      const updatedDoc = {
+        $set: {
+          name : data.name,
+          email : data.email, 
+          photo : data.photo,
+        },
+      };
+      // console.log(updatedDoc)
+      const options = {upsert: true};
+      const result = await userCollection.updateOne(filter, updatedDoc, options);
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
