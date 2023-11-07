@@ -49,8 +49,19 @@ async function run() {
       const page = parseInt(req.query.page);
       const size = parseInt(req.query.size);
         const result = await dataCollection.find()
+        .sort({ _id: -1 })
       .skip(page * size)
       .limit(size)
+      .toArray();
+      res.send(result);
+    })
+
+    // Get food data filtering the email
+    app.get('/dashboard/foods/:email', async(req, res)=>{
+      const email = req.params.email;
+      const query = { addBy: email };
+        const result = await dataCollection.find(query)
+        .sort({ _id: -1 })
       .toArray();
       res.send(result);
     })
@@ -142,6 +153,9 @@ async function run() {
       res.send(result);
     });
 
+
+
+    
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
