@@ -134,6 +134,14 @@ async function run() {
     })
 
 
+    // Add a food in the server
+    app.post("/addfood", async (req, res) => {
+      const foodData = req.body;
+      console.log(foodData)
+      const result = await dataCollection?.insertOne(foodData);
+      res.send(result);
+    });
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
