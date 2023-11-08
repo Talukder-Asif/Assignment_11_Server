@@ -23,24 +23,24 @@ app.use(
 );
 
 // JWT Middleware
-const verifyToken = async (req, res, next) => {
-  const token = req.cookies?.token;
-  if (!token) {
-    return res
-      .status(401)
-      .send({ success: false, message: "No token provided" });
-  }
-  jwt.verify(token, process.env.SECRET, function (err, decoded) {
-    //err
-    if (err) {
-      console.log(err);
-      return res.status(401).send({ success: false, message: "Invalid token" });
-    }
-    //decoded
-    req.user = decoded;
-    next();
-  });
-};
+// const verifyToken = async (req, res, next) => {
+//   const token = req.cookies?.token;
+//   if (!token) {
+//     return res
+//       .status(401)
+//       .send({ success: false, message: "No token provided" });
+//   }
+//   jwt.verify(token, process.env.SECRET, function (err, decoded) {
+//     //err
+//     if (err) {
+//       console.log(err);
+//       return res.status(401).send({ success: false, message: "Invalid token" });
+//     }
+//     //decoded
+//     req.user = decoded;
+//     next();
+//   });
+// };
 
 // Mongodb server code
 
@@ -92,7 +92,7 @@ async function run() {
     });
 
     // Get food data filtering the email
-    app.get("/dashboard/foods/:email", verifyToken, async (req, res) => {
+    app.get("/dashboard/foods/:email", async (req, res) => {
       const email = req.params.email;
       const query = { addBy: email };
       const result = await dataCollection
@@ -147,11 +147,8 @@ async function run() {
       res.send(result);
     });
 // Get user data from database
-    app.get("/user/:email",verifyToken, async (req, res) => {
-      if (toString(req.query.email) !== toString(req.user.email))
-      {
-        return res.status(403).send({message:"forbident access"});
-      }
+    app.get("/user/:email", async (req, res) => {
+     
       const userEmail = req.params.email;
       const quary = { email : userEmail };
       const result = await userCollection.findOne(quary);
@@ -197,7 +194,7 @@ async function run() {
     });
 
     // Add a food in the server
-    app.post("/addfood", verifyToken, async (req, res) => {
+    app.post("/addfood", async (req, res) => {
       const foodData = req.body;
       console.log(foodData);
       const result = await dataCollection?.insertOne(foodData);
@@ -205,7 +202,7 @@ async function run() {
     });
 
     // delete item of cliend from server
-    app.delete("/food/:id", verifyToken, async (req, res) => {
+    app.delete("/food/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await dataCollection.deleteOne(query);
@@ -213,11 +210,8 @@ async function run() {
     });
 
     // get the order info from the database
-    app.get("/order/:email", verifyToken, async (req, res) => {
-      if (toString(req.query.email) !== toString(req.user.email))
-      {
-        return res.status(403).send({message:"forbident access"});
-      }
+    app.get("/order/:email", async (req, res) => {
+     
       const email = req.params.email;
       const query = { orderdemail: email };
       const result = await orderCollection
@@ -228,7 +222,7 @@ async function run() {
     });
 
     // Delete a order history
-    app.delete("/order/:id", verifyToken, async (req, res) => {
+    app.delete("/order/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
@@ -236,19 +230,19 @@ async function run() {
     });
 
     // JWT
-    app.post("/jwt", async (req, res) => {
-      const user = req.body;
-      const token = jwt.sign(user, process.env.SECRET, { expiresIn: "24h" });
-      const expirationDate = new Date();
-      expirationDate.setDate(expirationDate.getDate() + 7);
-      res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: false,
-          expires: expirationDate,
-        })
-        .send({ msg: "Succeed" });
-    });
+    // app.post("/jwt", async (req, res) => {
+    //   const user = req.body;
+    //   const token = jwt.sign(user, process.env.SECRET, { expiresIn: "24h" });
+    //   const expirationDate = new Date();
+    //   expirationDate.setDate(expirationDate.getDate() + 7);
+    //   res
+    //     .cookie("token", token, {
+    //       httpOnly: true,
+    //       secure: false,
+    //       expires: expirationDate,
+    //     })
+    //     .send({ msg: "Succeed" });
+    // });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
