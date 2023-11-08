@@ -93,10 +93,6 @@ async function run() {
 
     // Get food data filtering the email
     app.get("/dashboard/foods/:email", verifyToken, async (req, res) => {
-      if (toString(req.query.email) !== toString(req.user.email))
-      {
-        return res.status(403).send({message:"forbident access"});
-      }
       const email = req.params.email;
       const query = { addBy: email };
       const result = await dataCollection
